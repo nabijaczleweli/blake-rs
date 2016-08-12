@@ -10,7 +10,11 @@ license = "MIT"
 version = "0.1.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
+build = "build.rs"
 
+
+[dependencies]
+libc = "0.2"
 
 [build-dependencies]
 gcc = "0.3"

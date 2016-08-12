@@ -1,6 +1,7 @@
 *
 !.gitignore
 !.travis.yml
+!build.rs
 !gh_rsa.enc
 !appveyor.yml
 !LICENSE
@@ -10,3 +11,5 @@
 !*.sublime-project
 !src
 !src/**
+!ext
+!ext/**
