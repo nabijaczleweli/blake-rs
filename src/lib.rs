@@ -26,10 +26,11 @@
 //!
 //! ```
 //! extern crate blake;
+//! use blake::Blake;
 //! # use std::iter::FromIterator;
 //!
 //! let mut result = [0; 64];
-//! let state = blake::State::new(512).unwrap();
+//! let state = Blake::new(512).unwrap();
 //!
 //! state.update("Zażółć ".as_bytes());
 //! state.update("gęślą ".as_bytes());
@@ -47,16 +48,18 @@
 //!                 0x10, 0x9E, 0x43, 0xC4, 0x0C, 0xE1, 0x27, 0xDA]);
 //! ```
 //!
-//! Comparing result of single- and multi-chunk hash methods hashing the same effective message with a 384-bit BLAKE hash function.
+//! Comparing result of single- and multi-chunk hash methods hashing the same effective message with a 384-bit BLAKE hash
+//! function.
 //!
 //! ```
 //! extern crate blake;
+//! use blake::Blake;
 //! # use std::iter::FromIterator;
 //!
 //! let mut result_multi  = [0; 48];
 //! let mut result_single = [0; 48];
 //!
-//! let state = blake::State::new(384).unwrap();
+//! let state = Blake::new(384).unwrap();
 //! state.update("Zażółć ".as_bytes());
 //! state.update("gęślą ".as_bytes());
 //! state.update("jaźń".as_bytes());
@@ -125,8 +128,9 @@ pub fn hash(hashbitlen: i32, data: &[u8], hashval: &mut [u8]) -> Result<()> {
 ///
 /// ```
 /// # extern crate blake;
+/// # use blake::Blake;
 /// # use std::iter::FromIterator;
-/// let state = blake::State::new(256).unwrap();
+/// let state = Blake::new(256).unwrap();
 ///
 /// state.update(b"Abolish ");
 /// state.update(b"the ");
@@ -141,8 +145,8 @@ pub fn hash(hashbitlen: i32, data: &[u8], hashval: &mut [u8]) -> Result<()> {
 ///                 0x0B, 0x21, 0xD8, 0xCC, 0x8E, 0x4D, 0xBB, 0x53,
 ///                 0x24, 0xDF, 0x10, 0xB7, 0x11, 0xF9, 0x82, 0x1C]);
 /// ```
-pub struct State {
-    raw: native::FFIHashState,
+pub struct Blake {
+    raw_state: native::FFIHashState,
 }
 
 /// Some functions in the library can fail, this enum represents all the possible ways they can.
@@ -150,12 +154,12 @@ pub struct State {
 pub enum BlakeError {
     /// Generic failure state
     Fail,
-    /// `hashbitlen` passed to `State::new()` or `hash()` incorrect
+    /// `hashbitlen` passed to `Blake::new()` or `hash()` incorrect
     BadHashbitlen,
 }
 
 
-impl State {
+impl Blake {
     /// Create a new hash state and initialise it with the given bit length.
     ///
     /// `hashbitlen` is the hash output length. <br />
@@ -169,7 +173,7 @@ impl State {
     /// Returns:
     ///
     ///   * `Err(BlakeError::BadHashbitlen)` if `hashbitlen` is not any of the mentioned above, or
-    ///   * `Ok(State)` if initialisation succeeds.
+    ///   * `Ok(Blake)` if initialisation succeeds.
     ///
     /// # Examples
     ///
@@ -177,22 +181,24 @@ impl State {
     ///
     /// ```
     /// # extern crate blake;
-    /// assert_eq!(blake::State::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));
+    /// # use blake::{Blake, BlakeError};
+    /// assert_eq!(Blake::new(0).map(|_| ()), Err(BlakeError::BadHashbitlen));
     /// ```
     ///
     /// Creating a 512-long state
     ///
     /// ```
     /// # extern crate blake;
-    /// blake::State::new(512).unwrap();
+    /// # use blake::Blake;
+    /// Blake::new(512).unwrap();
     /// ```
-    pub fn new(hashbitlen: i32) -> Result<State> {
-        let mut raw = native::malloc_hash_state();
+    pub fn new(hashbitlen: i32) -> Result<Blake> {
+        let mut raw_state = native::malloc_hash_state();
 
-        match unsafe { native::Init(raw, hashbitlen) } {
-            0 => Ok(State { raw: raw }),
+        match unsafe { native::Init(raw_state, hashbitlen) } {
+            0 => Ok(Blake { raw_state: raw_state }),
             e => {
-                native::free_hash_state(&mut raw);
+                native::free_hash_state(&mut raw_state);
                 Err(BlakeError::from(e))
             }
         }
@@ -202,8 +208,8 @@ impl State {
     ///
     /// Returns:
     ///
-    ///   * `Err(BlakeError::Fail)` if called after `State::update()`, or
-    ///   * `Ok(())`, if called before `State::update()`.
+    ///   * `Err(BlakeError::Fail)` if called after `Blake::update()`, or
+    ///   * `Ok(())`, if called before `Blake::update()`.
     ///
     /// The salt's length depends on the hash function's length.
     ///
@@ -218,12 +224,13 @@ impl State {
     ///
     /// ```
     /// # extern crate blake;
+    /// # use blake::Blake;
     /// # use std::iter::FromIterator;
     /// let mut result_unsalted = [0; 64];
     /// let mut result_salted   = [0; 64];
     ///
-    /// let state_unsalted = blake::State::new(512).unwrap();
-    /// let state_salted   = blake::State::new(512).unwrap();
+    /// let state_unsalted = Blake::new(512).unwrap();
+    /// let state_salted   = Blake::new(512).unwrap();
     ///
     /// state_salted.add_salt(b"Violent  murder  of  the  proles").unwrap();
     ///
@@ -237,7 +244,7 @@ impl State {
     ///         Vec::from_iter(result_salted  .iter().map(|&i| i)))
     /// ```
     pub fn add_salt(&self, salt: &[u8]) -> Result<()> {
-        match unsafe { native::AddSalt(self.raw, salt.as_ptr()) } {
+        match unsafe { native::AddSalt(self.raw_state, salt.as_ptr()) } {
             0 => Ok(()),
             e => Err(BlakeError::from(e)),
         }
@@ -251,10 +258,11 @@ impl State {
     ///
     /// ```
     /// # extern crate blake;
+    /// # use blake::Blake;
     /// # use std::iter::FromIterator;
     /// let mut result = [0; 64];
     ///
-    /// let state = blake::State::new(512).unwrap();
+    /// let state = Blake::new(512).unwrap();
     /// state.update("    Serbiańcy znowu się pochlali, ale w sumie".as_bytes());
     /// state.update("czegoż się po wschodnich słowianach spodziewać, swoją".as_bytes());
     /// state.update("drogą. I, jak to wszystkim homo sapiensom się dzieje".as_bytes());
@@ -273,7 +281,7 @@ impl State {
     /// ```
     pub fn update(&self, data: &[u8]) {
         unsafe {
-            native::Update(self.raw, data.as_ptr(), data.len() as u64 * 8);
+            native::Update(self.raw_state, data.as_ptr(), data.len() as u64 * 8);
         }
     }
 
@@ -289,16 +297,17 @@ impl State {
     ///
     /// ```
     /// # extern crate blake;
+    /// # use blake::Blake;
     /// # use std::iter::FromIterator;
     /// let mut result_224 = [0; 28];
     /// let mut result_256 = [0; 32];
     /// let mut result_384 = [0; 48];
     /// let mut result_512 = [0; 64];
     ///
-    /// let state_224 = blake::State::new(224).unwrap();
-    /// let state_256 = blake::State::new(256).unwrap();
-    /// let state_384 = blake::State::new(384).unwrap();
-    /// let state_512 = blake::State::new(512).unwrap();
+    /// let state_224 = Blake::new(224).unwrap();
+    /// let state_256 = Blake::new(256).unwrap();
+    /// let state_384 = Blake::new(384).unwrap();
+    /// let state_512 = Blake::new(512).unwrap();
     ///
     /// state_224.update(b"The lazy fox jumps over the lazy dog.");
     /// state_256.update(b"The lazy fox jumps over the lazy dog.");
@@ -339,14 +348,14 @@ impl State {
     /// ```
     pub fn finalise(&self, hashval: &mut [u8]) {
         unsafe {
-            native::Final(self.raw, hashval.as_mut_ptr());
+            native::Final(self.raw_state, hashval.as_mut_ptr());
         }
     }
 }
 
-impl Drop for State {
+impl Drop for Blake {
     fn drop(&mut self) {
-        native::free_hash_state(&mut self.raw);
+        native::free_hash_state(&mut self.raw_state);
     }
 }
 
