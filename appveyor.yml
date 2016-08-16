@@ -20,6 +20,8 @@ install:
   - bash -lc "pacman --noconfirm -Sy"
   - bash -lc "pacman --noconfirm -S mingw-w64-x86_64-toolchain"
 
+build: off
+
 test: off
 test_script:
   - cargo test --verbose
