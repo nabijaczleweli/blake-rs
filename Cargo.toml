@@ -7,7 +7,7 @@ readme = "README.md"
 keywords = ["hash", "blake"]
 license = "MIT"
 # Remember to also update in appveyor.yml
-version = "0.1.0"
+version = "1.0.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
 build = "build.rs"
