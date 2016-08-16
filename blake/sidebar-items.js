@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["BlakeError",""]],"fn":[["hash",""]],"struct":[["State",""]],"type":[["Result",""]]});
+initSidebarItems({"enum":[["BlakeError","Some functions in the library can fail, this enum represents all the possible ways they can."]],"fn":[["hash","Hash all data in one fell swoop."]],"struct":[["State","Hashing state for multiple data sets."]],"type":[["Result","Helper result type containing `BlakeError`."]]});
