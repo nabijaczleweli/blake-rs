@@ -421,6 +421,7 @@
 <span id="377">377</span>
 <span id="378">378</span>
 <span id="379">379</span>
+<span id="380">380</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! An implementation of the [BLAKE hash function](http://131002.net/blake), via FFI to reference implementation.</span>
 <span class='doccomment'>//!</span>
@@ -453,7 +454,7 @@
 <span class='doccomment'>//! # use std::iter::FromIterator;</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! let mut result = [0; 64];</span>
-<span class='doccomment'>//! let state = blake::State::new(512).unwrap();</span>
+<span class='doccomment'>//! let state = blake::Blake::new(512).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! state.update(&quot;Zażółć &quot;.as_bytes());</span>
 <span class='doccomment'>//! state.update(&quot;gęślą &quot;.as_bytes());</span>
@@ -471,7 +472,8 @@
 <span class='doccomment'>//!                 0x10, 0x9E, 0x43, 0xC4, 0x0C, 0xE1, 0x27, 0xDA]);</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! Comparing result of single- and multi-chunk hash methods hashing the same effective message with a 384-bit BLAKE hash function.</span>
+<span class='doccomment'>//! Comparing result of single- and multi-chunk hash methods hashing the same effective message with a 384-bit BLAKE hash</span>
+<span class='doccomment'>//! function.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//! extern crate blake;</span>
@@ -480,7 +482,7 @@
 <span class='doccomment'>//! let mut result_multi  = [0; 48];</span>
 <span class='doccomment'>//! let mut result_single = [0; 48];</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! let state = blake::State::new(384).unwrap();</span>
+<span class='doccomment'>//! let state = blake::Blake::new(384).unwrap();</span>
 <span class='doccomment'>//! state.update(&quot;Zażółć &quot;.as_bytes());</span>
 <span class='doccomment'>//! state.update(&quot;gęślą &quot;.as_bytes());</span>
 <span class='doccomment'>//! state.update(&quot;jaźń&quot;.as_bytes());</span>
@@ -550,7 +552,7 @@
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// # extern crate blake;</span>
 <span class='doccomment'>/// # use std::iter::FromIterator;</span>
-<span class='doccomment'>/// let state = blake::State::new(256).unwrap();</span>
+<span class='doccomment'>/// let state = blake::Blake::new(256).unwrap();</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// state.update(b&quot;Abolish &quot;);</span>
 <span class='doccomment'>/// state.update(b&quot;the &quot;);</span>
@@ -565,8 +567,8 @@
 <span class='doccomment'>///                 0x0B, 0x21, 0xD8, 0xCC, 0x8E, 0x4D, 0xBB, 0x53,</span>
 <span class='doccomment'>///                 0x24, 0xDF, 0x10, 0xB7, 0x11, 0xF9, 0x82, 0x1C]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>State</span> {
-    <span class='ident'>raw</span>: <span class='ident'>native</span>::<span class='ident'>FFIHashState</span>,
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Blake</span> {
+    <span class='ident'>raw_state</span>: <span class='ident'>native</span>::<span class='ident'>FFIHashState</span>,
 }
 
 <span class='doccomment'>/// Some functions in the library can fail, this enum represents all the possible ways they can.</span>
@@ -574,12 +576,12 @@
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BlakeError</span> {
     <span class='doccomment'>/// Generic failure state</span>
     <span class='ident'>Fail</span>,
-    <span class='doccomment'>/// `hashbitlen` passed to `State::new()` or `hash()` incorrect</span>
+    <span class='doccomment'>/// `hashbitlen` passed to `Blake::new()` or `hash()` incorrect</span>
     <span class='ident'>BadHashbitlen</span>,
 }
 
 
-<span class='kw'>impl</span> <span class='ident'>State</span> {
+<span class='kw'>impl</span> <span class='ident'>Blake</span> {
     <span class='doccomment'>/// Create a new hash state and initialise it with the given bit length.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// `hashbitlen` is the hash output length. &lt;br /&gt;</span>
@@ -593,7 +595,7 @@
     <span class='doccomment'>/// Returns:</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>///   * `Err(BlakeError::BadHashbitlen)` if `hashbitlen` is not any of the mentioned above, or</span>
-    <span class='doccomment'>///   * `Ok(State)` if initialisation succeeds.</span>
+    <span class='doccomment'>///   * `Ok(Blake)` if initialisation succeeds.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>///</span>
@@ -601,22 +603,22 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// # extern crate blake;</span>
-    <span class='doccomment'>/// assert_eq!(blake::State::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));</span>
+    <span class='doccomment'>/// assert_eq!(blake::Blake::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Creating a 512-long state</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// # extern crate blake;</span>
-    <span class='doccomment'>/// blake::State::new(512).unwrap();</span>
+    <span class='doccomment'>/// blake::Blake::new(512).unwrap();</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>hashbitlen</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>State</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>native</span>::<span class='ident'>malloc_hash_state</span>();
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>hashbitlen</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Blake</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>raw_state</span> <span class='op'>=</span> <span class='ident'>native</span>::<span class='ident'>malloc_hash_state</span>();
 
-        <span class='kw'>match</span> <span class='kw'>unsafe</span> { <span class='ident'>native</span>::<span class='ident'>Init</span>(<span class='ident'>raw</span>, <span class='ident'>hashbitlen</span>) } {
-            <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>State</span> { <span class='ident'>raw</span>: <span class='ident'>raw</span> }),
+        <span class='kw'>match</span> <span class='kw'>unsafe</span> { <span class='ident'>native</span>::<span class='ident'>Init</span>(<span class='ident'>raw_state</span>, <span class='ident'>hashbitlen</span>) } {
+            <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Blake</span> { <span class='ident'>raw_state</span>: <span class='ident'>raw_state</span> }),
             <span class='ident'>e</span> <span class='op'>=&gt;</span> {
-                <span class='ident'>native</span>::<span class='ident'>free_hash_state</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>raw</span>);
+                <span class='ident'>native</span>::<span class='ident'>free_hash_state</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>raw_state</span>);
                 <span class='prelude-val'>Err</span>(<span class='ident'>BlakeError</span>::<span class='ident'>from</span>(<span class='ident'>e</span>))
             }
         }
@@ -626,8 +628,8 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns:</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>///   * `Err(BlakeError::Fail)` if called after `State::update()`, or</span>
-    <span class='doccomment'>///   * `Ok(())`, if called before `State::update()`.</span>
+    <span class='doccomment'>///   * `Err(BlakeError::Fail)` if called after `Blake::update()`, or</span>
+    <span class='doccomment'>///   * `Ok(())`, if called before `Blake::update()`.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The salt&#39;s length depends on the hash function&#39;s length.</span>
     <span class='doccomment'>///</span>
@@ -646,8 +648,8 @@
     <span class='doccomment'>/// let mut result_unsalted = [0; 64];</span>
     <span class='doccomment'>/// let mut result_salted   = [0; 64];</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let state_unsalted = blake::State::new(512).unwrap();</span>
-    <span class='doccomment'>/// let state_salted   = blake::State::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state_unsalted = blake::Blake::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state_salted   = blake::Blake::new(512).unwrap();</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// state_salted.add_salt(b&quot;Violent  murder  of  the  proles&quot;).unwrap();</span>
     <span class='doccomment'>///</span>
@@ -661,7 +663,7 @@
     <span class='doccomment'>///         Vec::from_iter(result_salted  .iter().map(|&amp;i| i)))</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_salt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>salt</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='kw'>unsafe</span> { <span class='ident'>native</span>::<span class='ident'>AddSalt</span>(<span class='self'>self</span>.<span class='ident'>raw</span>, <span class='ident'>salt</span>.<span class='ident'>as_ptr</span>()) } {
+        <span class='kw'>match</span> <span class='kw'>unsafe</span> { <span class='ident'>native</span>::<span class='ident'>AddSalt</span>(<span class='self'>self</span>.<span class='ident'>raw_state</span>, <span class='ident'>salt</span>.<span class='ident'>as_ptr</span>()) } {
             <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(()),
             <span class='ident'>e</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>BlakeError</span>::<span class='ident'>from</span>(<span class='ident'>e</span>)),
         }
@@ -678,7 +680,7 @@
     <span class='doccomment'>/// # use std::iter::FromIterator;</span>
     <span class='doccomment'>/// let mut result = [0; 64];</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let state = blake::State::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state = blake::Blake::new(512).unwrap();</span>
     <span class='doccomment'>/// state.update(&quot;    Serbiańcy znowu się pochlali, ale w sumie&quot;.as_bytes());</span>
     <span class='doccomment'>/// state.update(&quot;czegoż się po wschodnich słowianach spodziewać, swoją&quot;.as_bytes());</span>
     <span class='doccomment'>/// state.update(&quot;drogą. I, jak to wszystkim homo sapiensom się dzieje&quot;.as_bytes());</span>
@@ -697,7 +699,7 @@
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>update</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
         <span class='kw'>unsafe</span> {
-            <span class='ident'>native</span>::<span class='ident'>Update</span>(<span class='self'>self</span>.<span class='ident'>raw</span>, <span class='ident'>data</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span> <span class='op'>*</span> <span class='number'>8</span>);
+            <span class='ident'>native</span>::<span class='ident'>Update</span>(<span class='self'>self</span>.<span class='ident'>raw_state</span>, <span class='ident'>data</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span> <span class='op'>*</span> <span class='number'>8</span>);
         }
     }
 
@@ -719,10 +721,10 @@
     <span class='doccomment'>/// let mut result_384 = [0; 48];</span>
     <span class='doccomment'>/// let mut result_512 = [0; 64];</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let state_224 = blake::State::new(224).unwrap();</span>
-    <span class='doccomment'>/// let state_256 = blake::State::new(256).unwrap();</span>
-    <span class='doccomment'>/// let state_384 = blake::State::new(384).unwrap();</span>
-    <span class='doccomment'>/// let state_512 = blake::State::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state_224 = blake::Blake::new(224).unwrap();</span>
+    <span class='doccomment'>/// let state_256 = blake::Blake::new(256).unwrap();</span>
+    <span class='doccomment'>/// let state_384 = blake::Blake::new(384).unwrap();</span>
+    <span class='doccomment'>/// let state_512 = blake::Blake::new(512).unwrap();</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// state_224.update(b&quot;The lazy fox jumps over the lazy dog.&quot;);</span>
     <span class='doccomment'>/// state_256.update(b&quot;The lazy fox jumps over the lazy dog.&quot;);</span>
@@ -763,14 +765,14 @@
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>finalise</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>hashval</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) {
         <span class='kw'>unsafe</span> {
-            <span class='ident'>native</span>::<span class='ident'>Final</span>(<span class='self'>self</span>.<span class='ident'>raw</span>, <span class='ident'>hashval</span>.<span class='ident'>as_mut_ptr</span>());
+            <span class='ident'>native</span>::<span class='ident'>Final</span>(<span class='self'>self</span>.<span class='ident'>raw_state</span>, <span class='ident'>hashval</span>.<span class='ident'>as_mut_ptr</span>());
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>State</span> {
+<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Blake</span> {
     <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='ident'>native</span>::<span class='ident'>free_hash_state</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>raw</span>);
+        <span class='ident'>native</span>::<span class='ident'>free_hash_state</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>raw_state</span>);
     }
 }
 
