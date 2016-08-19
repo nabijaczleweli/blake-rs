@@ -112,7 +112,7 @@ pub type Result<T> = std::result::Result<T, BlakeError>;
 ///                 0x80, 0xAF, 0x3F, 0xC7, 0x91, 0x3E, 0xF5, 0xB8]);
 /// ```
 pub fn hash(hashbitlen: i32, data: &[u8], hashval: &mut [u8]) -> Result<()> {
-    match unsafe { native::Hash(hashbitlen, data.as_ptr(), data.len() as u64 * 8, hashval.as_mut_ptr()) } {
+    match unsafe { native::BLAKE_Hash_Hash(hashbitlen, data.as_ptr(), data.len() as u64 * 8, hashval.as_mut_ptr()) } {
         0 => Ok(()),
         e => Err(BlakeError::from(e)),
     }
@@ -190,7 +190,7 @@ impl Blake {
     pub fn new(hashbitlen: i32) -> Result<Blake> {
         let mut raw_state = native::malloc_hash_state();
 
-        match unsafe { native::Init(raw_state, hashbitlen) } {
+        match unsafe { native::BLAKE_Hash_Init(raw_state, hashbitlen) } {
             0 => Ok(Blake { raw_state: raw_state }),
             e => {
                 native::free_hash_state(&mut raw_state);
@@ -238,7 +238,7 @@ impl Blake {
     ///         Vec::from_iter(result_salted  .iter().map(|&i| i)))
     /// ```
     pub fn add_salt(&self, salt: &[u8]) -> Result<()> {
-        match unsafe { native::AddSalt(self.raw_state, salt.as_ptr()) } {
+        match unsafe { native::BLAKE_Hash_AddSalt(self.raw_state, salt.as_ptr()) } {
             0 => Ok(()),
             e => Err(BlakeError::from(e)),
         }
@@ -274,7 +274,7 @@ impl Blake {
     /// ```
     pub fn update(&self, data: &[u8]) {
         unsafe {
-            native::Update(self.raw_state, data.as_ptr(), data.len() as u64 * 8);
+            native::BLAKE_Hash_Update(self.raw_state, data.as_ptr(), data.len() as u64 * 8);
         }
     }
 
@@ -340,7 +340,7 @@ impl Blake {
     /// ```
     pub fn finalise(&self, hashval: &mut [u8]) {
         unsafe {
-            native::Final(self.raw_state, hashval.as_mut_ptr());
+            native::BLAKE_Hash_Final(self.raw_state, hashval.as_mut_ptr());
         }
     }
 }

@@ -15,16 +15,16 @@ typedef unsigned long long u64;
 /*
   type for raw data
 */
-typedef unsigned char BitSequence; 
+typedef unsigned char BitSequence;
 
-/* 
-  64-bit word 
+/*
+  64-bit word
 */
-typedef unsigned long long DataLength; 
+typedef unsigned long long DataLength;
 
 
 /*
-  byte-to-word conversion and vice-versa (little endian)  
+  byte-to-word conversion and vice-versa (little endian)
 */
 #define U8TO32_BE(p) \
   (((u32)((p)[0]) << 24) | \
@@ -54,23 +54,23 @@ typedef unsigned long long DataLength;
 */
 typedef enum { SUCCESS=0, FAIL=1, BAD_HASHBITLEN=2  } HashReturn;
 
-/* 
+/*
    hash structure
 */
-typedef struct  { 
+typedef struct  {
   int hashbitlen;  /* length of the hash value (bits) */
   int datalen;     /* amount of remaining data to hash (bits) */
   int init;        /* set to 1 when initialized */
   int nullt;       /* Boolean value for special case \ell_i=0 */
   /*
-    variables for the 32-bit version  
+    variables for the 32-bit version
   */
   u32 h32[8];         /* current chain value (initialized to the IV) */
   u32 t32[2];         /* number of bits hashed so far */
   BitSequence data32[64];     /* remaining data to hash (less than a block) */
   u32 salt32[4];      /* salt (null by default) */
   /*
-    variables for the 64-bit version  
+    variables for the 64-bit version
   */
   u64 h64[8];      /* current chain value (initialized to the IV) */
   u64 t64[2];      /* number of bits hashed so far */
@@ -89,7 +89,7 @@ typedef struct  {
   SUCCESS on success
   BAD_HASHBITLEN if hashbitlen invalid
 */
-HashReturn Init( hashState * state, int hashbitlen );
+HashReturn BLAKE_Hash_Init( hashState * state, int hashbitlen );
 
 /*
   adds a salt to the hash function (OPTIONAL)
@@ -102,7 +102,7 @@ HashReturn Init( hashState * state, int hashbitlen );
   OUTPUT
   SUCCESS on success
  */
-HashReturn AddSalt( hashState * state, const BitSequence * salt );
+HashReturn BLAKE_Hash_AddSalt( hashState * state, const BitSequence * salt );
 
 /*
   update the state (chain value) with new data, storing overhead data if necessary
@@ -115,7 +115,7 @@ HashReturn AddSalt( hashState * state, const BitSequence * salt );
   OUTPUT
   SUCCESS on success
 */
-HashReturn Update( hashState * state, const BitSequence * data, DataLength databitlen );
+HashReturn BLAKE_Hash_Update( hashState * state, const BitSequence * data, DataLength databitlen );
 
 /*
   finalize the hash, hashing remaining data and padding the message
@@ -127,7 +127,7 @@ HashReturn Update( hashState * state, const BitSequence * data, DataLength datab
   OUTPUT
   SUCCESS on success
 */
-HashReturn Final( hashState * state, BitSequence * hashval );
+HashReturn BLAKE_Hash_Final( hashState * state, BitSequence * hashval );
 
 /*
   all-in-once function
@@ -140,7 +140,7 @@ HashReturn Final( hashState * state, BitSequence * hashval );
   FAIL if arbitrary failure
   BAD_HASHBITLEN if invalid hashbitlen
 */
-HashReturn Hash( int hashbitlen, const BitSequence * data, DataLength databitlen, 
+HashReturn BLAKE_Hash_Hash( int hashbitlen, const BitSequence * data, DataLength databitlen,
 		 BitSequence * hashval );
 
 /*
@@ -156,7 +156,7 @@ static const unsigned char sigma[][16] = {
     { 12,  5,  1, 15, 14, 13,  4, 10,  0,  7,  6,  3,  9,  2,  8, 11 } ,
     { 13, 11,  7, 14, 12,  1,  3,  9,  5,  0, 15,  4,  8,  6,  2, 10 } ,
     {  6, 15, 14,  9, 11,  3,  0,  8, 12,  2, 13,  7,  1,  4, 10,  5 } ,
-    { 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13 , 0 }, 
+    { 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13 , 0 },
     {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 } ,
     { 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 } ,
     { 11,  8, 12,  0,  5,  2, 15, 13, 10, 14,  3,  6,  7,  1,  9,  4 } ,
@@ -166,7 +166,7 @@ static const unsigned char sigma[][16] = {
     { 12,  5,  1, 15, 14, 13,  4, 10,  0,  7,  6,  3,  9,  2,  8, 11 } ,
     { 13, 11,  7, 14, 12,  1,  3,  9,  5,  0, 15,  4,  8,  6,  2, 10 } ,
     {  6, 15, 14,  9, 11,  3,  0,  8, 12,  2, 13,  7,  1,  4, 10,  5 } ,
-    { 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13 , 0 }  
+    { 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13 , 0 }
   };
 
 /*
@@ -180,7 +180,7 @@ static const u32 c32[16] = {
     0x452821E6, 0x38D01377,
     0xBE5466CF, 0x34E90C6C,
     0xC0AC29B7, 0xC97C50DD,
-    0x3F84D5B5, 0xB5470917 
+    0x3F84D5B5, 0xB5470917
 };
 
 /*

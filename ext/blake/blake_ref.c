@@ -12,7 +12,7 @@ static HashReturn compress32( hashState * state, const BitSequence * datablock )
 #define ROT32(x,n) (((x)<<(32-n))|( (x)>>(n)))
 #define ADD32(x,y)   ((u32)((x) + (y)))
 #define XOR32(x,y)    ((u32)((x) ^ (y)))
-  
+
 #define G32(a,b,c,d,i)\
   do { \
     v[a] = ADD32(v[a],v[b])+XOR32(m[sigma[round][2*i]], c32[sigma[round][2*i+1]]);\
@@ -76,7 +76,7 @@ static HashReturn compress32( hashState * state, const BitSequence * datablock )
     G32( 0, 4, 8,12, 0);
     G32( 1, 5, 9,13, 1);
     G32( 2, 6,10,14, 2);
-    G32( 3, 7,11,15, 3);    
+    G32( 3, 7,11,15, 3);
 
     /* diagonal step */
     G32( 0, 5,10,15, 4);
@@ -109,7 +109,7 @@ static HashReturn compress64( hashState * state, const BitSequence * datablock )
 #define ROT64(x,n) (((x)<<(64-n))|( (x)>>(n)))
 #define ADD64(x,y)   ((u64)((x) + (y)))
 #define XOR64(x,y)    ((u64)((x) ^ (y)))
-  
+
 #define G64(a,b,c,d,i)\
   do { \
     v[a] = ADD64(v[a],v[b])+XOR64(m[sigma[round][2*i]], c64[sigma[round][2*i+1]]);\
@@ -153,7 +153,7 @@ static HashReturn compress64( hashState * state, const BitSequence * datablock )
   v[ 9] = state->salt64[1] ^ c64[1];
   v[10] = state->salt64[2] ^ c64[2];
   v[11] = state->salt64[3] ^ c64[3];
-  if (state->nullt) { 
+  if (state->nullt) {
     v[12] =  c64[4];
     v[13] =  c64[5];
     v[14] =  c64[6];
@@ -164,7 +164,7 @@ static HashReturn compress64( hashState * state, const BitSequence * datablock )
     v[13] = state->t64[0] ^ c64[5];
     v[14] = state->t64[1] ^ c64[6];
     v[15] = state->t64[1] ^ c64[7];
-  }  
+  }
 
   /*  do 16 rounds */
   for(round=0; round<NB_ROUNDS64; ++round) {
@@ -173,7 +173,7 @@ static HashReturn compress64( hashState * state, const BitSequence * datablock )
     G64( 0, 4, 8,12, 0);
     G64( 1, 5, 9,13, 1);
     G64( 2, 6,10,14, 2);
-    G64( 3, 7,11,15, 3);    
+    G64( 3, 7,11,15, 3);
     /* diagonal step */
     G64( 0, 5,10,15, 4);
     G64( 1, 6,11,12, 5);
@@ -197,16 +197,16 @@ static HashReturn compress64( hashState * state, const BitSequence * datablock )
 
 
 
-HashReturn Init( hashState * state, int hashbitlen ) {
+HashReturn BLAKE_Hash_Init( hashState * state, int hashbitlen ) {
 
   int i;
 
   if ( (hashbitlen == 224) || (hashbitlen == 256) )  {
     /* 224- and 256-bit versions (32-bit words) */
 
-    if (hashbitlen == 224) 
-      memcpy( state->h32, IV224, sizeof(IV224) );      
-    else 
+    if (hashbitlen == 224)
+      memcpy( state->h32, IV224, sizeof(IV224) );
+    else
       memcpy( state->h32, IV256, sizeof(IV256) );
 
     state->t32[0] = 0;
@@ -219,14 +219,14 @@ HashReturn Init( hashState * state, int hashbitlen ) {
     state->salt32[1] = 0;
     state->salt32[2] = 0;
     state->salt32[3] = 0;
-     
+
   }
   else if ( (hashbitlen == 384) || (hashbitlen == 512) ){
     /* 384- and 512-bit versions (64-bit words) */
 
-    if (hashbitlen == 384) 
-      memcpy( state->h64, IV384, sizeof(IV384) );      
-    else 
+    if (hashbitlen == 384)
+      memcpy( state->h64, IV384, sizeof(IV384) );
+    else
       memcpy( state->h64, IV512, sizeof(IV512) );
 
     state->t64[0] = 0;
@@ -234,13 +234,13 @@ HashReturn Init( hashState * state, int hashbitlen ) {
 
     for(i=0; i<64; ++i)
       state->data64[i] = 0;
-    
+
     state->salt64[0] = 0;
     state->salt64[1] = 0;
     state->salt64[2] = 0;
-    state->salt64[3] = 0;    
+    state->salt64[3] = 0;
 
-    
+
   }
   else
     return BAD_HASHBITLEN;
@@ -255,14 +255,14 @@ HashReturn Init( hashState * state, int hashbitlen ) {
 
 
 
-HashReturn AddSalt( hashState * state, const BitSequence * salt ) {
+HashReturn BLAKE_Hash_AddSalt( hashState * state, const BitSequence * salt ) {
 
 
   /* if hashbitlen=224 or 256, then the salt should be 128-bit (16 bytes) */
   /* if hashbitlen=384 or 512, then the salt should be 256-bit (32 bytes) */
 
   /* fail if Init() was not called before */
-  if (state->init != 1) 
+  if (state->init != 1)
     return FAIL;
 
   if ( state->hashbitlen < 384 ) {
@@ -288,11 +288,11 @@ static HashReturn Update32(hashState * state, const BitSequence * data, DataLeng
 
   int fill;
   int left; /* to handle data inputs of up to 2^64-1 bits */
-  
+
   if ( ( databitlen == 0 ) && (state->datalen != 512 ) )
     return SUCCESS;
 
-  left = (state->datalen >> 3); 
+  left = (state->datalen >> 3);
   fill = 64 - left;
 
   /* compress remaining data filled with new bits */
@@ -303,11 +303,11 @@ static HashReturn Update32(hashState * state, const BitSequence * data, DataLeng
     state->t32[0] += 512;
     if (state->t32[0] == 0)
       state->t32[1]++;
-      
+
     compress32( state, state->data32 );
     data += fill;
-    databitlen  -= (fill << 3); 
-      
+    databitlen  -= (fill << 3);
+
     left = 0;
   }
 
@@ -323,7 +323,7 @@ static HashReturn Update32(hashState * state, const BitSequence * data, DataLeng
     data += 64;
     databitlen  -= 512;
   }
-  
+
   if( databitlen > 0 ) {
     memcpy( (void *) (state->data32 + left),
 	    (void *) data, databitlen>>3 );
@@ -360,14 +360,14 @@ static HashReturn Update64(hashState * state, const BitSequence * data, DataLeng
 
    compress64( state, state->data64 );
    data += fill;
-   databitlen  -= (fill << 3); 
-      
+   databitlen  -= (fill << 3);
+
     left = 0;
   }
 
   /* compress data until enough for a block */
   while( databitlen >= 1024 ) {
-  
+
     /* update counter */
    state->t64[0] += 1024;
    compress64( state, data );
@@ -391,7 +391,7 @@ static HashReturn Update64(hashState * state, const BitSequence * data, DataLeng
 }
 
 
-HashReturn Update(hashState * state, const BitSequence * data, DataLength databitlen ) {
+HashReturn BLAKE_Hash_Update(hashState * state, const BitSequence * data, DataLength databitlen ) {
 
   if ( state->hashbitlen < 384 )
     return Update32( state, data, databitlen );
@@ -406,7 +406,7 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
   unsigned char msglen[8];
   BitSequence zz=0x00,zo=0x01,oz=0x80,oo=0x81;
 
-  /* 
+  /*
      copy nb. bits hash in total as a 64-bit BE word
   */
   u32 low, high;
@@ -423,7 +423,7 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
     if ( state->datalen == 440 ) {
       /* special case of one padding byte */
       state->t32[0] -= 8;
-      if ( state->hashbitlen == 224 ) 
+      if ( state->hashbitlen == 224 )
 	Update32( state, &oz, 8 );
       else
 	Update32( state, &oo, 8 );
@@ -431,7 +431,7 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
     else {
       if ( state->datalen < 440 ) {
 	/* use t=0 if no remaining data */
-	if ( state->datalen == 0 ) 
+	if ( state->datalen == 0 )
 	  state->nullt=1;
 	/* enough space to fill the block  */
 	state->t32[0] -= 440 - state->datalen;
@@ -445,25 +445,25 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
 	Update32( state, padding+1, 440 );  /* padd with zeroes */
 	state->nullt = 1; /* raise flag to set t=0 at the next compress */
       }
-      if ( state->hashbitlen == 224 ) 
+      if ( state->hashbitlen == 224 )
 	Update32( state, &zz, 8 );
       else
 	Update32( state, &zo, 8 );
       state->t32[0] -= 8;
     }
     state->t32[0] -= 64;
-    Update32( state, msglen, 64 );    
+    Update32( state, msglen, 64 );
   }
-  else {  
+  else {
     /* message bitlength NOT multiple of 8 */
 
     /*  add '1' */
-    state->data32[state->datalen/8] &= (0xFF << (8-state->datalen%8)); 
-    state->data32[state->datalen/8] ^= (0x80 >> (state->datalen%8)); 
+    state->data32[state->datalen/8] &= (0xFF << (8-state->datalen%8));
+    state->data32[state->datalen/8] ^= (0x80 >> (state->datalen%8));
 
     if (( state->datalen > 440 ) && ( state->datalen < 447 )) {
       /*  special case of one padding byte */
-      if ( state->hashbitlen == 224 ) 
+      if ( state->hashbitlen == 224 )
 	state->data32[state->datalen/8] ^= 0x00;
       else
 	state->data32[state->datalen/8] ^= 0x01;
@@ -471,14 +471,14 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
       /* set datalen to a 8 multiple */
       state->datalen = (state->datalen&(DataLength)0xfffffffffffffff8ULL)+8;
     }
-    else { 
+    else {
       if (state->datalen < 440) {
 	/* enough space to fill the block */
 	state->t32[0] -= 440 - state->datalen;
 	state->datalen = (state->datalen&(DataLength)0xfffffffffffffff8ULL)+8;
-	Update( state, padding+1, 440 - state->datalen );
+	BLAKE_Hash_Update( state, padding+1, 440 - state->datalen );
       }
-      else { 
+      else {
 	if (state->datalen > 504 ) {
 	  /* special case */
 	  state->t32[0] -= 512 - state->datalen;
@@ -500,13 +500,13 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
 	}
       }
       state->t32[0] -= 8;
-      if ( state->hashbitlen == 224 ) 
+      if ( state->hashbitlen == 224 )
 	Update32( state, &zz, 8 );
       else
 	Update32( state, &zo, 8 );
     }
     state->t32[0] -= 64;
-    Update32( state, msglen, 64 ); 
+    Update32( state, msglen, 64 );
   }
 
   U32TO8_BE( hashval + 0, state->h32[0]);
@@ -520,7 +520,7 @@ static HashReturn Final32( hashState * state, BitSequence * hashval ) {
   if ( state->hashbitlen == 256 ) {
     U32TO8_BE( hashval +28, state->h32[7]);
   }
-  
+
   return SUCCESS;
 }
 
@@ -545,8 +545,8 @@ static HashReturn Final64( hashState * state, BitSequence * hashval ) {
 
     if ( state->datalen == 888 ) {
       /* special case of one padding byte */
-      state->t64[0] -= 8; 
-      if ( state->hashbitlen == 384 ) 
+      state->t64[0] -= 8;
+      if ( state->hashbitlen == 384 )
 	Update64( state, &oz, 8 );
       else
 	Update64( state, &oo, 8 );
@@ -554,39 +554,39 @@ static HashReturn Final64( hashState * state, BitSequence * hashval ) {
     else {
       if ( state->datalen < 888 ) {
 	/* use t=0 if no remaining data */
-	if ( state->datalen == 0 ) 
+	if ( state->datalen == 0 )
 	  state->nullt=1;
 	/* enough space to fill the block */
 	state->t64[0] -= 888 - state->datalen;
 	Update64( state, padding, 888 - state->datalen );
       }
-      else { 
+      else {
 	/* NOT enough space, need 2 compressions */
-	state->t64[0] -= 1024 - state->datalen; 
+	state->t64[0] -= 1024 - state->datalen;
 	Update64( state, padding, 1024 - state->datalen );
 	state->t64[0] -= 888;
 	Update64( state, padding+1, 888 );  /* padd with zeros */
 	state->nullt = 1; /* raise flag to set t=0 at the next compress */
       }
-      if ( state->hashbitlen == 384 ) 
+      if ( state->hashbitlen == 384 )
 	Update64( state, &zz, 8 );
       else
-	Update( state, &zo, 8 );
+	BLAKE_Hash_Update( state, &zo, 8 );
       state->t64[0] -= 8;
     }
     state->t64[0] -= 128;
-    Update( state, msglen, 128 );    
+    BLAKE_Hash_Update( state, msglen, 128 );
   }
-  else {  
+  else {
     /* message bitlength NOT multiple of 8 */
 
     /* add '1' */
-    state->data64[state->datalen/8] &= (0xFF << (8-state->datalen%8)); 
-    state->data64[state->datalen/8] ^= (0x80 >> (state->datalen%8)); 
+    state->data64[state->datalen/8] &= (0xFF << (8-state->datalen%8));
+    state->data64[state->datalen/8] ^= (0x80 >> (state->datalen%8));
 
     if (( state->datalen > 888 ) && ( state->datalen < 895 )) {
       /*  special case of one padding byte */
-      if ( state->hashbitlen == 384 ) 
+      if ( state->hashbitlen == 384 )
 	state->data64[state->datalen/8] ^= zz;
       else
 	state->data64[state->datalen/8] ^= zo;
@@ -594,7 +594,7 @@ static HashReturn Final64( hashState * state, BitSequence * hashval ) {
       /* set datalen to a 8 multiple */
       state->datalen = (state->datalen&(DataLength)0xfffffffffffffff8ULL)+8;
     }
-    else { 
+    else {
       if (state->datalen < 888) {
 	/* enough space to fill the block */
 	state->t64[0] -= 888 - state->datalen;
@@ -623,13 +623,13 @@ static HashReturn Final64( hashState * state, BitSequence * hashval ) {
 	}
       }
       state->t64[0] -= 8;
-      if ( state->hashbitlen == 384 ) 
+      if ( state->hashbitlen == 384 )
 	Update64( state, &zz, 8 );
       else
 	Update64( state, &zo, 8 );
     }
     state->t64[0] -= 128;
-    Update( state, msglen, 128 ); 
+    BLAKE_Hash_Update( state, msglen, 128 );
   }
 
   U64TO8_BE( hashval + 0, state->h64[0]);
@@ -643,31 +643,31 @@ static HashReturn Final64( hashState * state, BitSequence * hashval ) {
     U64TO8_BE( hashval +48, state->h64[6]);
     U64TO8_BE( hashval +56, state->h64[7]);
   }
-  
+
   return SUCCESS;
 }
 
-HashReturn Final( hashState * state, BitSequence * hashval ) {
-  
+HashReturn BLAKE_Hash_Final( hashState * state, BitSequence * hashval ) {
+
   if ( state->hashbitlen < 384 )
     return Final32( state, hashval );
   else
     return Final64( state, hashval );
 }
 
-HashReturn Hash( int hashbitlen, const BitSequence * data, DataLength databitlen, 
+HashReturn BLAKE_Hash_Hash( int hashbitlen, const BitSequence * data, DataLength databitlen,
 		 BitSequence * hashval ) {
 
   HashReturn ret;
   hashState state;
 
-  ret = Init( &state, hashbitlen );
+  ret = BLAKE_Hash_Init( &state, hashbitlen );
   if ( ret != SUCCESS ) return ret;
 
-  ret = Update( &state, data, databitlen );
+  ret = BLAKE_Hash_Update( &state, data, databitlen );
   if ( ret != SUCCESS ) return ret;
 
-  ret = Final( &state, hashval );
+  ret = BLAKE_Hash_Final( &state, hashval );
 
  return ret;
 
@@ -679,7 +679,7 @@ HashReturn Hash( int hashbitlen, const BitSequence * data, DataLength databitlen
 int main() {
 
   int i;
-  BitSequence data[144]; 
+  BitSequence data[144];
   BitSequence hash[64];
 
   for(i=0; i<144; ++i)
@@ -688,22 +688,22 @@ int main() {
   printf("\none-block message:\n");
 
   printf("\nBLAKE-256\n");
-  Hash( 256, data, 8, hash );    
+  Hash( 256, data, 8, hash );
   for(i=0; i<32; ++i)
     printf("%02X", hash[i]);
   printf("\n");
   printf("\nBLAKE-224\n");
-  Hash( 224, data, 8, hash );    
+  Hash( 224, data, 8, hash );
   for(i=0; i<28; ++i)
     printf("%02X", hash[i]);
   printf("\n");
   printf("\nBLAKE-512\n");
-  Hash( 512, data, 8, hash );    
+  Hash( 512, data, 8, hash );
   for(i=0; i<64; ++i)
     printf("%02X", hash[i]);
   printf("\n");
   printf("\nBLAKE-384\n");
-  Hash( 384, data, 8, hash );    
+  Hash( 384, data, 8, hash );
   for(i=0; i<48; ++i)
     printf("%02X", hash[i]);
   printf("\n");
@@ -711,22 +711,22 @@ int main() {
   printf("\ntwo-block message:\n");
 
   printf("\nBLAKE-256\n");
-  Hash( 256, data, 576, hash );    
+  Hash( 256, data, 576, hash );
   for(i=0; i<32; ++i)
     printf("%02X", hash[i]);
   printf("\n");
   printf("\nBLAKE-224\n");
-  Hash( 224, data, 576, hash );    
+  Hash( 224, data, 576, hash );
   for(i=0; i<28; ++i)
     printf("%02X", hash[i]);
   printf("\n");
   printf("\nBLAKE-512\n");
-  Hash( 512, data, 1152, hash );    
+  Hash( 512, data, 1152, hash );
   for(i=0; i<64; ++i)
     printf("%02X", hash[i]);
   printf("\n");
   printf("\nBLAKE-384\n");
-  Hash( 384, data, 1152, hash );    
+  Hash( 384, data, 1152, hash );
   for(i=0; i<48; ++i)
     printf("%02X", hash[i]);
   printf("\n");
