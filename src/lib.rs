@@ -9,9 +9,8 @@
 //! Hashing a single chunk of data with a 256-bit BLAKE hash function, then verifying the result.
 //!
 //! ```
-//! extern crate blake;
+//! # use blake::Blake;
 //! # use std::iter::FromIterator;
-//!
 //! let mut result = [0; 32];
 //! blake::hash(256, b"The lazy fox jumps over the lazy dog", &mut result).unwrap();
 //!
@@ -25,11 +24,10 @@
 //! Hashing multiple chunks of data with a 512-bit BLAKE hash function, then verifying the result.
 //!
 //! ```
-//! extern crate blake;
+//! # use blake::Blake;
 //! # use std::iter::FromIterator;
-//!
 //! let mut result = [0; 64];
-//! let state = blake::Blake::new(512).unwrap();
+//! let state = Blake::new(512).unwrap();
 //!
 //! state.update("Zażółć ".as_bytes());
 //! state.update("gęślą ".as_bytes());
@@ -51,13 +49,12 @@
 //! function.
 //!
 //! ```
-//! extern crate blake;
+//! # use blake::Blake;
 //! # use std::iter::FromIterator;
-//!
 //! let mut result_multi  = [0; 48];
 //! let mut result_single = [0; 48];
 //!
-//! let state = blake::Blake::new(384).unwrap();
+//! let state = Blake::new(384).unwrap();
 //! state.update("Zażółć ".as_bytes());
 //! state.update("gęślą ".as_bytes());
 //! state.update("jaźń".as_bytes());
@@ -89,7 +86,7 @@ pub type Result<T> = std::result::Result<T, BlakeError>;
 /// # Example
 ///
 /// ```
-/// # extern crate blake;
+/// # use blake::Blake;
 /// # use std::iter::FromIterator;
 /// let mut result_256 = [0; 32];
 /// let mut result_512 = [0; 64];
@@ -126,9 +123,9 @@ pub fn hash(hashbitlen: i32, data: &[u8], hashval: &mut [u8]) -> Result<()> {
 /// Hashing a string split into multiple chunks.
 ///
 /// ```
-/// # extern crate blake;
+/// # use blake::Blake;
 /// # use std::iter::FromIterator;
-/// let state = blake::Blake::new(256).unwrap();
+/// let state = Blake::new(256).unwrap();
 ///
 /// state.update(b"Abolish ");
 /// state.update(b"the ");
@@ -196,15 +193,15 @@ impl Blake {
     /// Incorrect `hashbitlen`
     ///
     /// ```
-    /// # extern crate blake;
-    /// assert_eq!(blake::Blake::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));
+    /// # use blake::Blake;
+    /// assert_eq!(Blake::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));
     /// ```
     ///
     /// Creating a 512-long state
     ///
     /// ```
-    /// # extern crate blake;
-    /// blake::Blake::new(512).unwrap();
+    /// # use blake::Blake;
+    /// Blake::new(512).unwrap();
     /// ```
     pub fn new(hashbitlen: i32) -> Result<Blake> {
         let mut raw_state = native::malloc_hash_state();
@@ -237,13 +234,13 @@ impl Blake {
     /// # Examples
     ///
     /// ```
-    /// # extern crate blake;
+    /// # use blake::Blake;
     /// # use std::iter::FromIterator;
     /// let mut result_unsalted = [0; 64];
     /// let mut result_salted   = [0; 64];
     ///
-    /// let state_unsalted = blake::Blake::new(512).unwrap();
-    /// let state_salted   = blake::Blake::new(512).unwrap();
+    /// let state_unsalted = Blake::new(512).unwrap();
+    /// let state_salted   = Blake::new(512).unwrap();
     ///
     /// state_salted.add_salt(b"Violent  murder  of  the  proles").unwrap();
     ///
@@ -270,11 +267,11 @@ impl Blake {
     /// Hashing a part of [a short story](http://nabijaczleweli.xyz/capitalism/writing/Świat_to_kilka_takich_pokoi/)
     ///
     /// ```
-    /// # extern crate blake;
+    /// # use blake::Blake;
     /// # use std::iter::FromIterator;
     /// let mut result = [0; 64];
     ///
-    /// let state = blake::Blake::new(512).unwrap();
+    /// let state = Blake::new(512).unwrap();
     /// state.update("    Serbiańcy znowu się pochlali, ale w sumie".as_bytes());
     /// state.update("czegoż się po wschodnich słowianach spodziewać, swoją".as_bytes());
     /// state.update("drogą. I, jak to wszystkim homo sapiensom się dzieje".as_bytes());
@@ -308,17 +305,17 @@ impl Blake {
     /// Storing and verifying results of all possible sizes.
     ///
     /// ```
-    /// # extern crate blake;
+    /// # use blake::Blake;
     /// # use std::iter::FromIterator;
     /// let mut result_224 = [0; 28];
     /// let mut result_256 = [0; 32];
     /// let mut result_384 = [0; 48];
     /// let mut result_512 = [0; 64];
     ///
-    /// let state_224 = blake::Blake::new(224).unwrap();
-    /// let state_256 = blake::Blake::new(256).unwrap();
-    /// let state_384 = blake::Blake::new(384).unwrap();
-    /// let state_512 = blake::Blake::new(512).unwrap();
+    /// let state_224 = Blake::new(224).unwrap();
+    /// let state_256 = Blake::new(256).unwrap();
+    /// let state_384 = Blake::new(384).unwrap();
+    /// let state_512 = Blake::new(512).unwrap();
     ///
     /// state_224.update(b"The lazy fox jumps over the lazy dog.");
     /// state_256.update(b"The lazy fox jumps over the lazy dog.");
