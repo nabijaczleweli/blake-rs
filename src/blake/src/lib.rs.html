@@ -422,6 +422,53 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! An implementation of the [BLAKE hash function](http://131002.net/blake), via FFI to reference implementation.</span>
 <span class='doccomment'>//!</span>
@@ -434,9 +481,8 @@
 <span class='doccomment'>//! Hashing a single chunk of data with a 256-bit BLAKE hash function, then verifying the result.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! extern crate blake;</span>
+<span class='doccomment'>//! # use blake::Blake;</span>
 <span class='doccomment'>//! # use std::iter::FromIterator;</span>
-<span class='doccomment'>//!</span>
 <span class='doccomment'>//! let mut result = [0; 32];</span>
 <span class='doccomment'>//! blake::hash(256, b&quot;The lazy fox jumps over the lazy dog&quot;, &amp;mut result).unwrap();</span>
 <span class='doccomment'>//!</span>
@@ -450,11 +496,10 @@
 <span class='doccomment'>//! Hashing multiple chunks of data with a 512-bit BLAKE hash function, then verifying the result.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! extern crate blake;</span>
+<span class='doccomment'>//! # use blake::Blake;</span>
 <span class='doccomment'>//! # use std::iter::FromIterator;</span>
-<span class='doccomment'>//!</span>
 <span class='doccomment'>//! let mut result = [0; 64];</span>
-<span class='doccomment'>//! let state = blake::Blake::new(512).unwrap();</span>
+<span class='doccomment'>//! let state = Blake::new(512).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! state.update(&quot;Zażółć &quot;.as_bytes());</span>
 <span class='doccomment'>//! state.update(&quot;gęślą &quot;.as_bytes());</span>
@@ -476,13 +521,12 @@
 <span class='doccomment'>//! function.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! extern crate blake;</span>
+<span class='doccomment'>//! # use blake::Blake;</span>
 <span class='doccomment'>//! # use std::iter::FromIterator;</span>
-<span class='doccomment'>//!</span>
 <span class='doccomment'>//! let mut result_multi  = [0; 48];</span>
 <span class='doccomment'>//! let mut result_single = [0; 48];</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! let state = blake::Blake::new(384).unwrap();</span>
+<span class='doccomment'>//! let state = Blake::new(384).unwrap();</span>
 <span class='doccomment'>//! state.update(&quot;Zażółć &quot;.as_bytes());</span>
 <span class='doccomment'>//! state.update(&quot;gęślą &quot;.as_bytes());</span>
 <span class='doccomment'>//! state.update(&quot;jaźń&quot;.as_bytes());</span>
@@ -500,6 +544,7 @@
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 
 
 <span class='doccomment'>/// Helper result type containing `BlakeError`.</span>
@@ -513,7 +558,7 @@
 <span class='doccomment'>/// # Example</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// # extern crate blake;</span>
+<span class='doccomment'>/// # use blake::Blake;</span>
 <span class='doccomment'>/// # use std::iter::FromIterator;</span>
 <span class='doccomment'>/// let mut result_256 = [0; 32];</span>
 <span class='doccomment'>/// let mut result_512 = [0; 64];</span>
@@ -550,9 +595,9 @@
 <span class='doccomment'>/// Hashing a string split into multiple chunks.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// # extern crate blake;</span>
+<span class='doccomment'>/// # use blake::Blake;</span>
 <span class='doccomment'>/// # use std::iter::FromIterator;</span>
-<span class='doccomment'>/// let state = blake::Blake::new(256).unwrap();</span>
+<span class='doccomment'>/// let state = Blake::new(256).unwrap();</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// state.update(b&quot;Abolish &quot;);</span>
 <span class='doccomment'>/// state.update(b&quot;the &quot;);</span>
@@ -566,6 +611,24 @@
 <span class='doccomment'>///                 0x6A, 0xE7, 0x2C, 0xC9, 0x94, 0x6F, 0x59, 0xBB,</span>
 <span class='doccomment'>///                 0x0B, 0x21, 0xD8, 0xCC, 0x8E, 0x4D, 0xBB, 0x53,</span>
 <span class='doccomment'>///                 0x24, 0xDF, 0x10, 0xB7, 0x11, 0xF9, 0x82, 0x1C]);</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// A `Write` implementation is also provided:</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// # use std::iter::FromIterator;</span>
+<span class='doccomment'>/// # use blake::Blake;</span>
+<span class='doccomment'>/// # use std::io;</span>
+<span class='doccomment'>/// let mut state = Blake::new(256).unwrap();</span>
+<span class='doccomment'>/// io::copy(&amp;mut &amp;b&quot;The lazy fox jumps over the lazy dog.&quot;[..], &amp;mut state).unwrap();</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let mut result = [0; 32];</span>
+<span class='doccomment'>/// state.finalise(&amp;mut result);</span>
+<span class='doccomment'>/// assert_eq!(Vec::from_iter(result.iter().map(|&amp;i| i)),</span>
+<span class='doccomment'>///            vec![0xF2, 0xE5, 0xA9, 0xD0, 0x93, 0xD8, 0xAA, 0x23,</span>
+<span class='doccomment'>///                 0x4E, 0x6C, 0x54, 0x50, 0x61, 0xE8, 0x17, 0xBE,</span>
+<span class='doccomment'>///                 0x83, 0x8B, 0x57, 0xD8, 0x99, 0x8F, 0x15, 0xDF,</span>
+<span class='doccomment'>///                 0x72, 0xE1, 0x03, 0x7F, 0xBF, 0xEB, 0x4F, 0xC7]);</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Blake</span> {
     <span class='ident'>raw_state</span>: <span class='ident'>native</span>::<span class='ident'>FFIHashState</span>,
@@ -602,15 +665,15 @@
     <span class='doccomment'>/// Incorrect `hashbitlen`</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate blake;</span>
-    <span class='doccomment'>/// assert_eq!(blake::Blake::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));</span>
+    <span class='doccomment'>/// # use blake::Blake;</span>
+    <span class='doccomment'>/// assert_eq!(Blake::new(0).map(|_| ()), Err(blake::BlakeError::BadHashbitlen));</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Creating a 512-long state</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate blake;</span>
-    <span class='doccomment'>/// blake::Blake::new(512).unwrap();</span>
+    <span class='doccomment'>/// # use blake::Blake;</span>
+    <span class='doccomment'>/// Blake::new(512).unwrap();</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>hashbitlen</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Blake</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>raw_state</span> <span class='op'>=</span> <span class='ident'>native</span>::<span class='ident'>malloc_hash_state</span>();
@@ -643,13 +706,13 @@
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate blake;</span>
+    <span class='doccomment'>/// # use blake::Blake;</span>
     <span class='doccomment'>/// # use std::iter::FromIterator;</span>
     <span class='doccomment'>/// let mut result_unsalted = [0; 64];</span>
     <span class='doccomment'>/// let mut result_salted   = [0; 64];</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let state_unsalted = blake::Blake::new(512).unwrap();</span>
-    <span class='doccomment'>/// let state_salted   = blake::Blake::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state_unsalted = Blake::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state_salted   = Blake::new(512).unwrap();</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// state_salted.add_salt(b&quot;Violent  murder  of  the  proles&quot;).unwrap();</span>
     <span class='doccomment'>///</span>
@@ -676,11 +739,11 @@
     <span class='doccomment'>/// Hashing a part of [a short story](http://nabijaczleweli.xyz/capitalism/writing/Świat_to_kilka_takich_pokoi/)</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate blake;</span>
+    <span class='doccomment'>/// # use blake::Blake;</span>
     <span class='doccomment'>/// # use std::iter::FromIterator;</span>
     <span class='doccomment'>/// let mut result = [0; 64];</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let state = blake::Blake::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state = Blake::new(512).unwrap();</span>
     <span class='doccomment'>/// state.update(&quot;    Serbiańcy znowu się pochlali, ale w sumie&quot;.as_bytes());</span>
     <span class='doccomment'>/// state.update(&quot;czegoż się po wschodnich słowianach spodziewać, swoją&quot;.as_bytes());</span>
     <span class='doccomment'>/// state.update(&quot;drogą. I, jak to wszystkim homo sapiensom się dzieje&quot;.as_bytes());</span>
@@ -714,17 +777,17 @@
     <span class='doccomment'>/// Storing and verifying results of all possible sizes.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate blake;</span>
+    <span class='doccomment'>/// # use blake::Blake;</span>
     <span class='doccomment'>/// # use std::iter::FromIterator;</span>
     <span class='doccomment'>/// let mut result_224 = [0; 28];</span>
     <span class='doccomment'>/// let mut result_256 = [0; 32];</span>
     <span class='doccomment'>/// let mut result_384 = [0; 48];</span>
     <span class='doccomment'>/// let mut result_512 = [0; 64];</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let state_224 = blake::Blake::new(224).unwrap();</span>
-    <span class='doccomment'>/// let state_256 = blake::Blake::new(256).unwrap();</span>
-    <span class='doccomment'>/// let state_384 = blake::Blake::new(384).unwrap();</span>
-    <span class='doccomment'>/// let state_512 = blake::Blake::new(512).unwrap();</span>
+    <span class='doccomment'>/// let state_224 = Blake::new(224).unwrap();</span>
+    <span class='doccomment'>/// let state_256 = Blake::new(256).unwrap();</span>
+    <span class='doccomment'>/// let state_384 = Blake::new(384).unwrap();</span>
+    <span class='doccomment'>/// let state_512 = Blake::new(512).unwrap();</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// state_224.update(b&quot;The lazy fox jumps over the lazy dog.&quot;);</span>
     <span class='doccomment'>/// state_256.update(b&quot;The lazy fox jumps over the lazy dog.&quot;);</span>
@@ -767,6 +830,37 @@
         <span class='kw'>unsafe</span> {
             <span class='ident'>native</span>::<span class='ident'>BLAKE_Hash_Final</span>(<span class='self'>self</span>.<span class='ident'>raw_state</span>, <span class='ident'>hashval</span>.<span class='ident'>as_mut_ptr</span>());
         }
+    }
+}
+
+<span class='doccomment'>/// The `Write` implementation updates the state with the provided data.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// For example, to hash a file:</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// # use std::iter::FromIterator;</span>
+<span class='doccomment'>/// # use std::fs::File;</span>
+<span class='doccomment'>/// # use blake::Blake;</span>
+<span class='doccomment'>/// # use std::io;</span>
+<span class='doccomment'>/// let mut state = Blake::new(256).unwrap();</span>
+<span class='doccomment'>/// io::copy(&amp;mut File::open(&quot;LICENSE&quot;).unwrap(), &amp;mut state).unwrap();</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let mut result = [0; 32];</span>
+<span class='doccomment'>/// state.finalise(&amp;mut result);</span>
+<span class='doccomment'>/// assert_eq!(Vec::from_iter(result.iter().map(|&amp;i| i)),</span>
+<span class='doccomment'>///            vec![0xED, 0xE4, 0xD8, 0xF8, 0x49, 0x25, 0xD0, 0xBD,</span>
+<span class='doccomment'>///                 0x06, 0xA4, 0xDC, 0x1C, 0xFD, 0x1B, 0x45, 0x62,</span>
+<span class='doccomment'>///                 0xA4, 0xBD, 0x35, 0x25, 0x76, 0x9B, 0x97, 0xF1,</span>
+<span class='doccomment'>///                 0x9B, 0x21, 0xC8, 0xDF, 0xDC, 0x4A, 0x80, 0xB1]);</span>
+<span class='doccomment'>/// ```</span>
+<span class='kw'>impl</span> <span class='ident'>io</span>::<span class='ident'>Write</span> <span class='kw'>for</span> <span class='ident'>Blake</span> {
+    <span class='kw'>fn</span> <span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>update</span>(<span class='ident'>buf</span>);
+        <span class='prelude-val'>Ok</span>(<span class='ident'>buf</span>.<span class='ident'>len</span>())
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>flush</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='prelude-val'>Ok</span>(())
     }
 }
 
@@ -860,11 +954,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "blake";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>
