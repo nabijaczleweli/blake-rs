@@ -75,6 +75,7 @@ mod native;
 
 use std::error::Error;
 use std::fmt;
+use std::io;
 
 
 /// Helper result type containing `BlakeError`.
@@ -141,6 +142,24 @@ pub fn hash(hashbitlen: i32, data: &[u8], hashval: &mut [u8]) -> Result<()> {
 ///                 0x6A, 0xE7, 0x2C, 0xC9, 0x94, 0x6F, 0x59, 0xBB,
 ///                 0x0B, 0x21, 0xD8, 0xCC, 0x8E, 0x4D, 0xBB, 0x53,
 ///                 0x24, 0xDF, 0x10, 0xB7, 0x11, 0xF9, 0x82, 0x1C]);
+/// ```
+///
+/// A `Write` implementation is also provided:
+///
+/// ```
+/// # use std::iter::FromIterator;
+/// # use blake::Blake;
+/// # use std::io;
+/// let mut state = Blake::new(256).unwrap();
+/// io::copy(&mut &b"The lazy fox jumps over the lazy dog."[..], &mut state).unwrap();
+///
+/// let mut result = [0; 32];
+/// state.finalise(&mut result);
+/// assert_eq!(Vec::from_iter(result.iter().map(|&i| i)),
+///            vec![0xF2, 0xE5, 0xA9, 0xD0, 0x93, 0xD8, 0xAA, 0x23,
+///                 0x4E, 0x6C, 0x54, 0x50, 0x61, 0xE8, 0x17, 0xBE,
+///                 0x83, 0x8B, 0x57, 0xD8, 0x99, 0x8F, 0x15, 0xDF,
+///                 0x72, 0xE1, 0x03, 0x7F, 0xBF, 0xEB, 0x4F, 0xC7]);
 /// ```
 pub struct Blake {
     raw_state: native::FFIHashState,
@@ -342,6 +361,37 @@ impl Blake {
         unsafe {
             native::BLAKE_Hash_Final(self.raw_state, hashval.as_mut_ptr());
         }
+    }
+}
+
+/// The `Write` implementation updates the state with the provided data.
+///
+/// For example, to hash a file:
+///
+/// ```
+/// # use std::iter::FromIterator;
+/// # use std::fs::File;
+/// # use blake::Blake;
+/// # use std::io;
+/// let mut state = Blake::new(256).unwrap();
+/// io::copy(&mut File::open("LICENSE").unwrap(), &mut state).unwrap();
+///
+/// let mut result = [0; 32];
+/// state.finalise(&mut result);
+/// assert_eq!(Vec::from_iter(result.iter().map(|&i| i)),
+///            vec![0xED, 0xE4, 0xD8, 0xF8, 0x49, 0x25, 0xD0, 0xBD,
+///                 0x06, 0xA4, 0xDC, 0x1C, 0xFD, 0x1B, 0x45, 0x62,
+///                 0xA4, 0xBD, 0x35, 0x25, 0x76, 0x9B, 0x97, 0xF1,
+///                 0x9B, 0x21, 0xC8, 0xDF, 0xDC, 0x4A, 0x80, 0xB1]);
+/// ```
+impl io::Write for Blake {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.update(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
     }
 }
 
