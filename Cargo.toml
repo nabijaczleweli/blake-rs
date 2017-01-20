@@ -5,6 +5,7 @@ documentation = "https://cdn.rawgit.com/nabijaczleweli/blake-rs/doc/blake/index.
 repository = "https://github.com/nabijaczleweli/blake-rs"
 readme = "README.md"
 keywords = ["hash", "blake"]
+categories = ["algorithms"]
 license = "MIT"
 # Remember to also update in appveyor.yml
 version = "1.1.0"
