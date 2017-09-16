@@ -27,7 +27,7 @@
 //! # use blake::Blake;
 //! # use std::iter::FromIterator;
 //! let mut result = [0; 64];
-//! let state = Blake::new(512).unwrap();
+//! let mut state = Blake::new(512).unwrap();
 //!
 //! state.update("Zażółć ".as_bytes());
 //! state.update("gęślą ".as_bytes());
@@ -54,7 +54,7 @@
 //! let mut result_multi  = [0; 48];
 //! let mut result_single = [0; 48];
 //!
-//! let state = Blake::new(384).unwrap();
+//! let mut state = Blake::new(384).unwrap();
 //! state.update("Zażółć ".as_bytes());
 //! state.update("gęślą ".as_bytes());
 //! state.update("jaźń".as_bytes());
@@ -125,7 +125,7 @@ pub fn hash(hashbitlen: i32, data: &[u8], hashval: &mut [u8]) -> Result<()> {
 /// ```
 /// # use blake::Blake;
 /// # use std::iter::FromIterator;
-/// let state = Blake::new(256).unwrap();
+/// let mut state = Blake::new(256).unwrap();
 ///
 /// state.update(b"Abolish ");
 /// state.update(b"the ");
@@ -239,8 +239,8 @@ impl Blake {
     /// let mut result_unsalted = [0; 64];
     /// let mut result_salted   = [0; 64];
     ///
-    /// let state_unsalted = Blake::new(512).unwrap();
-    /// let state_salted   = Blake::new(512).unwrap();
+    /// let mut state_unsalted = Blake::new(512).unwrap();
+    /// let mut state_salted   = Blake::new(512).unwrap();
     ///
     /// state_salted.add_salt(b"Violent  murder  of  the  proles").unwrap();
     ///
@@ -253,7 +253,7 @@ impl Blake {
     /// assert!(Vec::from_iter(result_unsalted.iter().map(|&i| i)) !=
     ///         Vec::from_iter(result_salted  .iter().map(|&i| i)))
     /// ```
-    pub fn add_salt(&self, salt: &[u8]) -> Result<()> {
+    pub fn add_salt(&mut self, salt: &[u8]) -> Result<()> {
         match unsafe { native::BLAKE_Hash_AddSalt(self.raw_state, salt.as_ptr()) } {
             0 => Ok(()),
             e => Err(BlakeError::from(e)),
@@ -271,7 +271,7 @@ impl Blake {
     /// # use std::iter::FromIterator;
     /// let mut result = [0; 64];
     ///
-    /// let state = Blake::new(512).unwrap();
+    /// let mut state = Blake::new(512).unwrap();
     /// state.update("    Serbiańcy znowu się pochlali, ale w sumie".as_bytes());
     /// state.update("czegoż się po wschodnich słowianach spodziewać, swoją".as_bytes());
     /// state.update("drogą. I, jak to wszystkim homo sapiensom się dzieje".as_bytes());
@@ -288,7 +288,7 @@ impl Blake {
     ///                 0xAA, 0xCA, 0xDC, 0x5B, 0x34, 0x96, 0x0B, 0x3C,
     ///                 0x87, 0x1F, 0x69, 0x46, 0xCD, 0xC2, 0xB2, 0x14]);
     /// ```
-    pub fn update(&self, data: &[u8]) {
+    pub fn update(&mut self, data: &[u8]) {
         unsafe {
             native::BLAKE_Hash_Update(self.raw_state, data.as_ptr(), data.len() as u64 * 8);
         }
@@ -312,10 +312,10 @@ impl Blake {
     /// let mut result_384 = [0; 48];
     /// let mut result_512 = [0; 64];
     ///
-    /// let state_224 = Blake::new(224).unwrap();
-    /// let state_256 = Blake::new(256).unwrap();
-    /// let state_384 = Blake::new(384).unwrap();
-    /// let state_512 = Blake::new(512).unwrap();
+    /// let mut state_224 = Blake::new(224).unwrap();
+    /// let mut state_256 = Blake::new(256).unwrap();
+    /// let mut state_384 = Blake::new(384).unwrap();
+    /// let mut state_512 = Blake::new(512).unwrap();
     ///
     /// state_224.update(b"The lazy fox jumps over the lazy dog.");
     /// state_256.update(b"The lazy fox jumps over the lazy dog.");
@@ -354,7 +354,7 @@ impl Blake {
     ///                 0x66, 0x6D, 0x9C, 0x4C, 0x23, 0xA5, 0x23, 0xD3,
     ///                 0x10, 0xA0, 0x58, 0x3F, 0x1E, 0x7C, 0xCC, 0xFE]);
     /// ```
-    pub fn finalise(&self, hashval: &mut [u8]) {
+    pub fn finalise(&mut self, hashval: &mut [u8]) {
         unsafe {
             native::BLAKE_Hash_Final(self.raw_state, hashval.as_mut_ptr());
         }
