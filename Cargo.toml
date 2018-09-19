@@ -1,7 +1,7 @@
 [package]
 name = "blake"
 description = "Implementation of the BLAKE hash function for Rust via FFI"
-documentation = "https://cdn.rawgit.com/nabijaczleweli/blake-rs/doc/blake/index.htmlhtml"
+documentation = "https://rawcdn.githack.com/nabijaczleweli/blake-rs/doc/blake/index.htmlhtml"
 repository = "https://github.com/nabijaczleweli/blake-rs"
 readme = "README.md"
 keywords = ["hash", "blake"]

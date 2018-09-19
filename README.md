@@ -2,4 +2,4 @@
 Implementation of the [BLAKE](http://131002.net/blake) hash function for Rust via FFI.
 
 
-## [Docs](https://cdn.rawgit.com/nabijaczleweli/blake-rs/doc/blake/index.html)
+## [Docs](https://rawcdn.githack.com/nabijaczleweli/blake-rs/doc/blake/index.html)
