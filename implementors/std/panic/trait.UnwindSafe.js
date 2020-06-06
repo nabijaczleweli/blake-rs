@@ -1,10 +1,3 @@
 (function() {var implementors = {};
-implementors["libc"] = [];
-
-            if (window.register_implementors) {
-                window.register_implementors(implementors);
-            } else {
-                window.pending_implementors = implementors;
-            }
-        
-})()
+implementors["blake"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/std/panic/trait.UnwindSafe.html\" title=\"trait std::panic::UnwindSafe\">UnwindSafe</a> for <a class=\"struct\" href=\"blake/struct.Blake.html\" title=\"struct blake::Blake\">Blake</a>","synthetic":true,"types":["blake::Blake"]},{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/std/panic/trait.UnwindSafe.html\" title=\"trait std::panic::UnwindSafe\">UnwindSafe</a> for <a class=\"enum\" href=\"blake/enum.BlakeError.html\" title=\"enum blake::BlakeError\">BlakeError</a>","synthetic":true,"types":["blake::BlakeError"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
