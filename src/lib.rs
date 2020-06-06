@@ -65,6 +65,13 @@
 //! assert_eq!(Vec::from_iter(result_multi .iter().map(|&i| i)),
 //!            Vec::from_iter(result_single.iter().map(|&i| i)));
 //! ```
+//!
+//! # Special thanks
+//!
+//! To all who support further development on [Patreon](https://patreon.com/nabijaczleweli), in particular:
+//!
+//!   * ThePhD
+//!   * Embark Studios
 
 extern crate libc;
 
