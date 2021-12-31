@@ -1,5 +1,10 @@
 sudo: false
 language: rust
+
+os:
+  - linux
+  - windows
+
 rust:
   - stable
   - beta
