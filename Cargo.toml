@@ -8,8 +8,9 @@ keywords = ["hash", "blake"]
 categories = ["algorithms"]
 license = "MIT"
 # Remember to also update in appveyor.yml
-version = "2.0.1"
-authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
+version = "2.0.2"
+authors = ["наб <nabijaczleweli@nabijaczleweli.xyz>",
+           "Philipp Degler <deglerp@googlemail.com>"]
 exclude = ["*.enc"]
 build = "build.rs"
 
