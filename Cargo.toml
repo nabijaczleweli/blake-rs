@@ -18,4 +18,4 @@ build = "build.rs"
 libc = "0.2"
 
 [build-dependencies]
-cc = "1"
+cc = "1.0"
